@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+    <div class="small">
+        <div class="cover"></div>
+        <img src="images/timg.jpg" alt="">
+        <div class="smallMove"></div>
+    </div>
+    <div class="big">
+        <img src="images/timg.jpg" alt="">
+    </div>
+    <script src="modules/jquery-3.2.1.js"></script>
+    <script>
+        function Magnifier(){
+
+        }
+        $.extend(Magnifier.prototype,{
+            init(){
+                this.small = $(".small");
+                this.smallMove = $(".smallMove"); //移动框框
+                this.smallImg = this.small.find("img");
+                this.bigBox = $(".big");
+                this.bigImg = $(".big").find("img");
+                this.handelEvent();
+
+            },
+            handelEvent(){
+                this.small.on("mouseenter",$.proxy(this.enterEvent , this));
+                this.small.on("mouseleave",$.proxy(this.leaveEvent , this));
+                this.small.on("mousemove",$.proxy(this.moveEvent , this))
+            },
+            enterEvent(){
+                // console.log("鼠标移入")
+                this.smallMove.fadeIn();
+                this.bigBox.fadeIn();
+            },
+            leaveEvent(){
+                // console.log("鼠标移出") 
+                this.smallMove.fadeOut(); 
+                this.bigBox.fadeOut();  
+            },
+            moveEvent(event){
+                // console.log("鼠标移动")
+                var nLeft = event.offsetX;
+                var nTop = event.offsetY;
+                // var leftM=nLeft - this.smallMove.width() / 2;
+                // var topM = nTop - this.smallMove.height() / 2
+                // this.smallMove.css({
+                //     left : nLeft - this.smallMove.width() / 2,
+                //     top : nTop - this.smallMove.height() / 2
+                // })
+                // this.smallMove.css({
+                //     backgroundPosition:leftM +"px" +  -topM+"px"
+                // })
+                this.posElem({
+                    left : nLeft - this.smallMove.width() / 2,
+                    top : nTop - this.smallMove.height() / 2
+                })
+                
+            },
+            posElem(pos){
+                 //边界检测
+                var minLeft = this.small.width() - this.smallMove.width();
+                pos.left = pos.left >= 0 ? pos.left : 0;
+                pos.left = pos.left <= minLeft ? pos.left : minLeft;
+                var minTop = this.small.height() - this.smallMove.height();
+                pos.top = pos.top >= 0 ? pos.top : 0;
+                pos.top = pos.top <= minTop ? pos.top : minTop;
+                this.smallMove.css({
+                    left:pos.left,
+                    top:pos.top
+                })
+                //遮罩
+                this.smallMove.css({
+                    backgroundPosition: - pos.left +"px " + -pos.top +"px"
+                })
+
+                var smallTotalLeft =minLeft;
+                var smallTotalTop =minTop;
+                var probLeft = (pos.left / smallTotalLeft).toFixed(2);
+                var probTop = (pos.top / smallTotalTop).toFixed(2);
+                console.log(probLeft,probTop);
+
+                var bigTotalLeft = this.bigImg.width() - this.bigBox.width();
+                var bigTotalTop = this.bigImg.height() - this.bigBox.width();
+                this.bigImg.css({
+                    left: -probLeft * bigTotalLeft,
+                    top : -probTop * bigTotalTop
+                })
+               
+
+               
+
+            }
+        })
+
+        new Magnifier().init();
+    </script>
+</body>
+</html>
